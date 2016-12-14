@@ -1,5 +1,13 @@
 
-function [clusterIDs, unitQuality, contaminationRate] = maskedClusterQualityKilosort(resultsDirectory)
+function [clusterIDs, unitQuality, contaminationRate] = maskedClusterQuality(resultsDirectory,varargin)
+%[clusterIDs, unitQuality, contaminationRate] = maskedClusterQuality(resultsDirectory)
+%  computes measures based on clustering by spike_clusters.npy 
+%  (or spike_templates.npy if spike_clusters.npy does not exist)
+%  returns measures for each unique cluster/template value, sorted by value
+%[clusterIDs, unitQuality, contaminationRate] = maskedClusterQuality(resultsDirectory,spike_clusters)
+%  if spike_clusters is given, this is used for spike assignments instead
+%  of spike_clusters.npy or spike_templates.npy
+clu=getparmC(varargin,1,0);
 
 fprintf(1, 'loading data...\n');
 %% Precompute the locationsn of files to be loaded
@@ -7,7 +15,6 @@ pcFeaturesPath = fullfile(resultsDirectory,'pc_features.npy');
 pcFeaturesIndPath = fullfile(resultsDirectory,'pc_feature_ind.npy');
 spikeClustersPath = fullfile(resultsDirectory,'spike_clusters.npy');
 spikeTemplatesPath = fullfile(resultsDirectory,'spike_templates.npy');
-
 
 %% Main code.
 try
@@ -25,8 +32,12 @@ pc_feature_ind = pc_feature_ind + 1;   % because in Python indexes start at 0
 
 if exist(spikeClustersPath,'file')
     fprintf('building features matrix from clusters/templates\n')
-    spike_clusters = readNPY(spikeClustersPath);
-    spike_clusters = spike_clusters + 1; % because in Python indexes start at 0
+    if(isequal(clu,0))
+        spike_clusters = readNPY(spikeClustersPath);
+        spike_clusters = spike_clusters + 1; % because in Python indexes start at 0
+    else
+        spike_clusters=clu;
+    end
         
     % now we have to construct a new pc_features that has the features
     % arranged according to *cluster* rather than template. 

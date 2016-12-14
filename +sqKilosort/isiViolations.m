@@ -1,6 +1,15 @@
 
 
-function isiV = isiViolations(resultsDirectory)
+function isiV = isiViolations(resultsDirectory,varargin)
+%isiV = isiViolations(resultsDirectory)
+%  computes isi volation rate based on clustering by spike_clusters.npy 
+%  (or spike_templates.npy if spike_clusters.npy does not exist)
+%  returns measures for each unique cluster/template value, sorted by value
+%isiV = isiViolations(resultsDirectory,spike_clusters)
+%  if spike_clusters is given, this is used for spike assignments instead
+%  of spike_clusters.npy or spike_templates.npy
+
+clu=getparmC(varargin,1,0);
 
 %% Precompute the locationsn of files to be loaded
 spikeClustersPath = fullfile(resultsDirectory,'spike_clusters.npy');
@@ -10,16 +19,22 @@ paramsPath= fullfile(resultsDirectory,'params.py');
 
 %% 
 
-refDur = 0.0015;
-minISI = 0.0005;
+refDur = 0.001;
+minISI = 0.0002;
 
 fprintf(1, 'loading data for ISI computation\n');
 if exist(spikeClustersPath)
-    spike_clusters = readNPY(spikeClustersPath);
+    if(isequal(clu,0))
+        spike_clusters = readNPY(spikeClustersPath);
+        %spike_clusters = spike_clusters + 1; % because in Python indexes start at 0
+    else
+        spike_clusters=clu;
+    end
 else
     spike_clusters = readNPY(spikeTemplatesPath);
+    %spike_clusters = spike_clusters + 1; % because in Python indexes start at 0
 end
-spike_clusters = spike_clusters + 1; % because in Python indexes start at 0
+
 
 spike_times = readNPY(spikeTimesPath);
 params = readKSparams(paramsPath);
