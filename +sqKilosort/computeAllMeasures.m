@@ -11,7 +11,7 @@ function [cgs, uQ, cR, isiV] = computeAllMeasures(resultsDirectory,varargin)
 
 clu=getparmC(varargin,1,0);
 
-clusterPath = fullfile(resultsDirectory, 'cluster_groups.tsv');
+clusterPath = fullfile(resultsDirectory, 'cluster_group.tsv');
 spikeClustersPath = fullfile(resultsDirectory,'spike_clusters.npy');
 spikeTemplatesPath = fullfile(resultsDirectory,'spike_templates.npy');
 
