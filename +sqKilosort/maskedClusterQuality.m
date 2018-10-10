@@ -62,7 +62,7 @@ if exist(spikeClustersPath,'file')
         theseTemplates = spike_templates(theseSpikes);
         [inclTemps, inst] = countUnique(theseTemplates); 
         
-        thisTemplate = inclTemps(inst==max(inst),1);
+        thisTemplate = inclTemps(find(inst==max(inst),1),1);
         
         theseChans = pc_feature_ind(thisTemplate,1:nFet);
         
