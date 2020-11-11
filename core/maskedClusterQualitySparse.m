@@ -1,6 +1,6 @@
 
 
-function [clusterIDs, unitQuality, contaminationRate] = maskedClusterQualitySparse(clu, fet, fetInds, fetNchans)
+function [clusterIDs, unitQuality, contaminationRate] = maskedClusterQualitySparse(clu, fet, fetInds, fetNchans,varargin)
 % - clu is 1 x nSpikes
 % - fet is nSpikes x nPCsPerChan x nInclChans
 % - fetInds is nClusters x nInclChans (sorted in descending order of
@@ -9,6 +9,11 @@ function [clusterIDs, unitQuality, contaminationRate] = maskedClusterQualitySpar
 
 if nargin<4
     fetNchans = min(4, size(fetInds,2)); % number of channels to use
+end
+if nargin>=5
+    do_these_IDs = varargin{1}; % number of channels to use
+else
+    do_these_IDs=[];
 end
 nFetPerChan = size(fet,2);
 fetN = fetNchans*nFetPerChan; % now number of features total
@@ -22,7 +27,13 @@ unitQuality = zeros(size(clusterIDs));
 contaminationRate = zeros(size(clusterIDs));
 
 fprintf('%12s\tQuality\tContamination\n', 'ID'); % comment to suppress printing out the intermediate results
-for c = 1:numel(clusterIDs)
+if isempty(do_these_IDs)
+    do_nums=1:numel(clusterIDs);
+else
+    [~,do_nums]=intersect(clusterIDs,do_these_IDs);
+    do_nums=do_nums';
+end
+for c = do_nums
     
     theseSp = clu==clusterIDs(c);
     n = sum(theseSp); % #spikes in this cluster

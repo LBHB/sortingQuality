@@ -8,6 +8,7 @@ function [clusterIDs, unitQuality, contaminationRate] = maskedClusterQuality(res
 %  if spike_clusters is given, this is used for spike assignments instead
 %  of spike_clusters.npy or spike_templates.npy
 clu=getparmC(varargin,1,0);
+do_these_IDs=getparmC(varargin,2,[]);
 
 fprintf(1, 'loading data...\n');
 %% Precompute the locationsn of files to be loaded
@@ -103,7 +104,11 @@ end
 assert(numel(size(pc_features)) == 3)
 
 fprintf(1, 'computing cluster qualities...\n');
-[clusterIDs, unitQuality, contaminationRate] = maskedClusterQualitySparse(spike_clusters, pc_features, pc_feature_ind);
+if isempty(do_these_IDs)
+    [clusterIDs, unitQuality, contaminationRate] = maskedClusterQualitySparse(spike_clusters, pc_features, pc_feature_ind);
+else
+    [clusterIDs, unitQuality, contaminationRate] = maskedClusterQualitySparse(spike_clusters, pc_features, pc_feature_ind, min(4, size(pc_feature_ind,2)),do_these_IDs);
+end
 
 
 
